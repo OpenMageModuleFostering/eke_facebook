@@ -1,0 +1,226 @@
+<?php
+$currencySymbol = Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol();
+?>
+
+<div class="heading col2-set">
+	<div class="col-1">
+        <div class="content">
+        	<h1><?php echo $this->__('Order Details') ?></h1>
+        </div>
+	</div>
+    
+    <div class="col-2">
+   		<div class="content">
+        	<?php if ($this->getOrderId()):?>
+				<?php if ($this->getCanViewOrder()) :?>
+                    <p><?php echo $this->__('Order # <span class="ordertext">%s</span>', sprintf('<a href="%s">%s</a>', $this->escapeHtml($this->getViewOrderUrl()), $this->escapeHtml($this->getOrderId()))) ?></p>
+                <?php  else :?>
+                    <p><?php echo $this->__('Order # <span class="ordertext">%s</span>', $this->escapeHtml($this->getOrderId())) ?></p>
+                <?php endif;?>
+            <?php endif;?>
+        </div>
+    </div>
+    
+</div>    
+
+<?php 
+// Order Details
+$orderInfo = Mage::getModel('sales/order')->load(Mage::getSingleton('checkout/session')->getLastOrderId()); 
+
+$customerName = $orderInfo->getShippingAddress()->getName();
+$customerAddress = $orderInfo->getShippingAddress()->getStreet();
+$customerZip = $orderInfo->getShippingAddress()->getPostcode();
+$customerCity = $orderInfo->getShippingAddress()->getCity();
+$customerRegion = $orderInfo->getShippingAddress()->getRegion();
+$customerCountry = $orderInfo->getShippingAddress()->getCountry();
+$customerPhone = $orderInfo->getShippingAddress()->getPhone();
+
+//Ship Details
+$ship = $orderInfo->getShippingDescription();
+
+//Get Payment
+$payment_method_code = $orderInfo->getPayment()->getMethodInstance()->getCode();
+$ccType = $orderInfo->getPayment()->getCcType();
+$ccLast4 = $orderInfo->getPayment()->getCcLast4();
+
+//Order Totals
+$orderSub = Mage::helper('core')->currency($orderInfo->getSubtotal(), true, false);
+$orderTax = Mage::helper('core')->currency($orderInfo->getTaxAmount(), true, false);
+$orderShip = Mage::helper('core')->currency($orderInfo->getShippingAmount(), true, false);
+$orderGrand = Mage::helper('core')->currency($orderInfo->getGrandTotal(), true, false);
+
+//var_dump($orderInfo);
+
+?>
+
+<div class="orderinfo col3-set">
+	<div class="col col-1">
+        <div class="content">
+        	<h1><?php echo $this->__('Ship To') ?></h1>
+            <p class="bold"><?php echo $customerName; ?></p>
+            <p><?php echo $customerAddress[0]; ?></p>
+            <p><?php echo $customerAddress[1]; ?></p>
+            <p><?php echo $customerAddress[2]; ?></p>
+            <p><?php echo $customerAddress[3]; ?></p>
+            <p><?php echo $customerCity; ?>, <?php echo $customerRegion; ?>, <?php echo $customerCountry; ?></p>
+			<p><?php echo $customerZip; ?></p>
+            <p><?php echo $customerPhone; ?></p>
+        </div>
+	</div>
+    
+    <div class="col col-2">
+   		<div class="content">
+        	<h1><?php echo $this->__('Payment') ?></h1>
+            <p><?php echo $ccType; ?></p>
+            <p>***<?php echo $ccLast4; ?></p>
+        </div>
+    </div>
+    
+     <div class="col col-3">
+   		<div class="totals content">
+        	<h1><?php echo $this->__('Order Total') ?></h1>
+            <p><span class="title bold">Subtotal:</span> <span class="value"><?php echo $orderSub; ?></span></p>
+            <p><span class="title">Shipping:</span> <span class="value"><?php echo $orderTax; ?></span></p>
+            <p><span class="title">Sales Tax:</span> <span class="value"><?php echo $orderShip; ?></span></p>
+            <p class="dashed"><span class="title">You Pay:</span> <span class="value"><?php echo $orderGrand; ?></span></p>
+        </div>
+    </div>
+    
+</div> 
+
+
+<div class="col1-set">
+
+    <h1>Order Details</h1>
+    <div style="height:500px;" id="map"></div>
+
+</div>
+
+
+
+<div class="col1-set">
+
+    	<?php 
+    $order_id = Mage::getSingleton('checkout/session')->getLastRealOrderId(); 
+    $order_details = Mage::getModel('sales/order')->loadByIncrementId($order_id); 
+    $shipping_address_data = $order_details->getShippingAddress();
+    ?>
+                <table class="tableproducts">
+                 <tr> 
+                    <th><?php echo $this->__('Description A') ?></th
+                    <th><?php echo $this->__('Qty') ?></th>
+                    <th><?php echo $this->__('Unit Price') ?></th>
+                </tr>
+
+            <?php foreach($order_details->getAllVisibleItems() as $item): 
+    $configItem = Mage::getModel('catalog/product')->loadByAttribute('sku', $item->getSku());
+    ?> 
+                <tr>
+                    <td><img src="<?php echo $this->helper('catalog/image')->init($configItem, 'small_image')->resize(200); ?>" width="200" height="200" class="media-object img-responsive" alt="<?php echo $this->getImageLabel($configItem, 'small_image'); ?>"/></td>
+                    <td><?php echo $item->getName() ?></td>
+                    <td><?php echo round($item->getQtyOrdered(), 0) ?></td>
+                    <td><?php echo Mage::helper("core")->currency($item->getPrice()) ?></td>
+                </tr>
+                </table>
+            <?php endforeach ?> 
+
+            <?php echo "<br>" . $shipping_address_data['country_name']; ?>
+
+</div>
+
+
+
+       <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+<?php 
+
+$address = str_replace(" ", "+", $customerAddress[0]);
+$customerRegion = str_replace(" ", "+", $customerRegion);
+$url = "http://maps.google.com/maps/api/geocode/json?address=$address&sensor=false&region=$customerRegion";
+$json = file_get_contents($url);
+$json = json_decode($json);
+
+$lat = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+$long = $json->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+
+
+$srcLat = 25.7899435;
+$srcLong = -80.3221517;
+?>
+
+ 
+    <script>
+
+    var map;
+
+function init() {
+
+	
+	
+    map = new google.maps.Map(document.getElementById('map'));
+
+    var p1 = new google.maps.LatLng(<?php echo $lat; ?>, <?php echo $long; ?>);
+    var p2 = new google.maps.LatLng(<?php echo $srcLat; ?>, <?php echo $srcLong; ?>);
+    var bounds = new google.maps.LatLngBounds();
+    bounds.extend(p1);
+    bounds.extend(p2);
+    map.fitBounds(bounds);
+    var markerP1 = new google.maps.Marker({
+        position: p1,
+        map: map
+    });
+    var markerP2 = new google.maps.Marker({
+        position: p2,
+        map: map
+    });
+    google.maps.event.addListener(map, 'projection_changed', function () {
+        var p1 = map.getProjection().fromLatLngToPoint(markerP1.getPosition());
+        var p2 = map.getProjection().fromLatLngToPoint(markerP2.getPosition());
+        var e = new google.maps.Point(p1.x - p2.x, p1.y - p2.y);
+        var m = new google.maps.Point(e.x / 2, e.y / 2);
+        var o = new google.maps.Point(0, 7);
+        var c = new google.maps.Point(m.x + o.x, m.y + o.y);
+        var curveMarker2 = new google.maps.Marker({
+            position: markerP1.getPosition(),
+            icon: {
+                path: "M 0 0 q " + c.x + " " + c.y + " " + e.x + " " + e.y,
+                scale: 24,
+                strokeWeight: 2,
+                fillColor: '#009933',
+                fillOpacity: 0,
+                rotation: 180,
+                anchor: new google.maps.Point(0, 0)
+            }
+        });
+        curveMarker2.setMap(map);
+        google.maps.event.addListener(map, 'zoom_changed', function () {
+            var zoom = map.getZoom();
+            var scale = 1 / (Math.pow(2, -zoom));
+            var icon = {
+                path: "M 0 0 q " + c.x + " " + c.y + " " + e.x + " " + e.y,
+                scale: scale,
+                strokeWeight: 2,
+                fillColor: '#009933',
+                fillOpacity: 0,
+                rotation: 180,
+                anchor: new google.maps.Point(0, 0)
+            };
+            curveMarker2.setIcon(icon);
+        });
+        3
+    });
+}
+
+    </script>
+    
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGW8TBVdcpyjp7tNA6CB18Ol0wM2U1_EI&callback=init"> </script>

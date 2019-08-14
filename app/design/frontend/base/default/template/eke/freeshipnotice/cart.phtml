@@ -1,0 +1,36 @@
+<?php
+$helper = Mage::helper("eke_freeshipnotice");
+if (!$helper->isFreeshipnotice_cartEnabled()) {
+    return;
+}
+
+$bgColor = $helper->getCartBgColor();
+$textColor = $helper->getCartTextColor();
+$textContent = $helper->getCartTextContent();
+$freeShipAmount = $helper->getFreeShipAmount();
+$freeShipText = $helper->getFreeShipText();
+
+$currencySymbol = Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol();
+$orderTotal = $this->helper('checkout/cart')->getQuote()->getGrandTotal();
+
+if ($orderTotal == 0){
+	return;
+}
+
+$amountLeft = $freeShipAmount - $orderTotal;
+$amountLeftCur = $currencySymbol . $amountLeft;
+
+
+$vars = array( '{{total}}' => $amountLeftCur);  
+
+
+?>
+
+
+<div style="background-color:#<?php echo $bgColor; ?>; color:#<?php echo $textColor; ?>" class="ekeFsnCart">
+	<?php if ($amountLeft < 0 ) {
+			echo $freeShipText; 
+		} else {
+			echo strtr($textContent, $vars); 
+	} ?>
+</div>

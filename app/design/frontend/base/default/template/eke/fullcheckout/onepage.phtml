@@ -1,0 +1,68 @@
+<?php 
+
+$configLogo = Mage::getStoreConfig('eke_fullcheckout/design/logo');
+
+if(!empty($configLogo)){
+	$logoPath = Mage::getBaseUrl('media').'eke/fullcheckout/' . Mage::getStoreConfig('eke_fullcheckout/design/logo');
+} else {
+	$logoSrc = Mage::getStoreConfig('design/header/logo_src');
+	$logoPath = $this->getSkinUrl($logoSrc);
+}
+
+
+?>
+
+<div class="storeLogo">
+    <a href="/" /><img src="<?php echo $logoPath; ?>" alt="<?php echo $logoAlt; ?>" /></a>
+</div>
+
+
+Customer Information > Shipping Method > Payment Method
+
+<script type="text/javascript" src="<?php echo $this->getJsUrl('varien/accordion.js') ?>"></script>
+<script type="text/javascript" src="<?php echo $this->getSkinUrl('js/opcheckout.js') ?>"></script>
+<ol class="opc" id="checkoutSteps">
+<?php $i=0; foreach($this->getSteps() as $_stepId => $_stepInfo): ?>
+<?php if (!$this->getChild($_stepId) || !$this->getChild($_stepId)->isShow()): continue; endif; $i++ ?>
+    <li id="opc-<?php echo $_stepId ?>" class="section<?php echo !empty($_stepInfo['allow'])?' allow':'' ?><?php echo !empty($_stepInfo['complete'])?' saved':'' ?>">
+        <div class="step-title">
+            <span class="number"><?php echo $i ?></span>
+            <h2><?php echo $_stepInfo['label'] ?></h2>
+            <a href="#"><?php echo $this->__('Edit') ?></a>
+        </div>
+        <div id="checkout-step-<?php echo $_stepId ?>" class="step a-item" style="display:none;">
+            <?php echo $this->getChildHtml($_stepId) ?>
+        </div>
+    </li>
+<?php endforeach ?>
+</ol>
+
+
+
+
+
+<input type="hidden" name="checkout_method" id="login:guest" checked="checked" value="guest">
+
+<script type="text/javascript">
+//<![CDATA[
+    var accordion = new Accordion('checkoutSteps', '.head', true);
+    <?php if($this->getActiveStep()): ?>
+    accordion.openSection('opc-billing');
+    <?php endif ?>
+    var checkout = new Checkout(accordion,{
+        progress: '<?php echo $this->getUrl('checkout/onepage/progress') ?>',
+        review: '<?php echo $this->getUrl('checkout/onepage/review') ?>',
+        saveMethod: '<?php echo $this->getUrl('checkout/onepage/saveMethod') ?>',
+        failure: '<?php echo $this->getUrl('checkout/cart') ?>'}
+    );
+
+    var chkmethod = $("login:guest");
+    chkmethod.checked = true;
+    checkout.setMethod(); 
+//]]>
+</script>
+
+
+<div id="footer" class="row">
+    <p><?php echo Mage::getStoreConfig('design/footer/copyright'); ?></p>
+</div>

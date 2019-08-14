@@ -1,0 +1,38 @@
+<?php
+$helper = Mage::helper("eke_inspectlet");
+if (!$helper->isTrackerPixelEnabled()) {
+    return;
+}
+$id = $helper->getTrackerWid();
+
+$request = $this->getRequest();
+$module = $request->getModuleName();
+$controller = $request->getControllerName();
+$action = $request->getActionName();
+
+?>
+
+<!-- Begin Inspectlet Embed Code -->
+<script type="text/javascript" id="inspectletjs">
+window.__insp = window.__insp || [];
+__insp.push(['wid', <?php echo $id; ?>]);
+<?php if ($helper->isEmailTrackEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {	$customer = Mage::getSingleton('customer/session')->getCustomer(); 
+echo "__insp.push(['tagSession', {email: \"".$customer->getEmail()."\"}]);\r\n";
+} ?>
+<?php if(Mage::registry('current_product')) { echo "__insp.push(['tagSession', \"Product Page\"]);\r\n"; } ?>
+<?php if(Mage::registry('current_product')) { echo "__insp.push(['tagSession', {product: \"".Mage::registry('current_product')->getName()."\"}]);\r\n";	} ?>
+<?php if(Mage::registry('current_category') && !Mage::registry('product')) { echo "__insp.push(['tagSession', \"Category Page\"]);\r\n"; } ?>
+<?php if(Mage::registry('current_category') && !Mage::registry('product')) { echo "__insp.push(['tagSession', {category: \"".Mage::registry('current_category')->getName()."\"}]);\r\n";	} ?>
+<?php if($controller == 'result' || $controller =='advanced') { echo "__insp.push(['tagSession', \"Search Page\"]);\r\n"; } ?>
+<?php if($controller == 'result' || $controller =='advanced') { echo "__insp.push(['tagSession', {search phrase: \"".Mage::helper('catalogsearch')->getQueryText()."\"}]);\r\n"; } ?>
+<?php if($module == 'checkout' && $controller == 'cart' && $action == 'index') { echo "__insp.push(['tagSession', \"Added To Cart\"]);\r\n"; } ?>
+<?php if($module == 'wishlist') { echo "__insp.push(['tagSession', \"Added To Wishlist\"]);\r\n"; } ?>
+<?php if($module == 'onestepcheckout' && $action == 'index') { echo "__insp.push(['tagSession', \"Checkout Initiated\"]);\r\n"; } ?>
+<?php if($module == 'checkout' && $action == 'success') { echo "__insp.push(['tagSession', \"Checkout Successful\"]);\r\n"; } ?>
+<?php if($module == 'customer' && $controller == 'account' && $action == 'index') { echo "__insp.push(['tagSession', \"Account Registration\"]);\r\n"; } ?>
+(function() {
+function ldinsp(){if(typeof window.__inspld != "undefined") return; window.__inspld = 1; var insp = document.createElement('script'); insp.type = 'text/javascript'; insp.async = true; insp.id = "inspsync"; insp.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://cdn.inspectlet.com/inspectlet.js'; var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(insp, x); };
+setTimeout(ldinsp, 500); document.readyState != "complete" ? (window.attachEvent ? window.attachEvent('onload', ldinsp) : window.addEventListener('load', ldinsp, false)) : ldinsp();
+})();
+</script>
+<!-- End Inspectlet Embed Code -->

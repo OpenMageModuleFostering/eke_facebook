@@ -1,0 +1,15 @@
+<?php
+$helper = Mage::helper("eke_blockdomain");
+if (!$helper->isDomainBlockEnabled()) {
+    return;
+}
+$domain = $helper->getDomainsList();
+$domain = explode(",", $domain);
+?>
+
+<script type="text/javascript">
+    Validation.add('validate-email','This domain is not allowed for registration.',function(v){
+		<?php foreach ($domain as $_domain){echo "if (/$_domain/i.test(v)){ return false; }\n";} ?>	
+		else { return true; }
+    });
+</script>

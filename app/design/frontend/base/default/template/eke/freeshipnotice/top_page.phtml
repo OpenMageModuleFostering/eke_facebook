@@ -1,0 +1,45 @@
+<?php
+$helper = Mage::helper("eke_freeshipnotice");
+if (!$helper->isFreeshipnotice_topEnabled()) {
+    return;
+}
+
+$bgColor = $helper->getTopBgColor();
+$textColor = $helper->getTopTextColor();
+$textContent = $helper->getTopTextContent();
+$freeShipAmount = $helper->getFreeShipAmount();
+$freeShipText = $helper->getFreeShipText();
+
+$currencySymbol = Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol();
+$orderTotal = $this->helper('checkout/cart')->getQuote()->getGrandTotal();
+
+if ($orderTotal == 0){
+	return;
+}
+
+$request = $this->getRequest();
+$module = $request->getModuleName();
+$controller = $request->getControllerName();
+$action = $request->getActionName();
+
+if($module == 'checkout' && $controller == 'cart' && $action == 'index' && $helper->isFreeshipnotice_topEnabled()) {
+	return;	
+}
+
+$amountLeft = $freeShipAmount - $orderTotal;
+$amountLeftCur = $currencySymbol . $amountLeft;
+
+
+$vars = array( '{{total}}' => $amountLeftCur);  
+
+
+?>
+
+
+<div style="background-color:#<?php echo $bgColor; ?>; color:#<?php echo $textColor; ?>" class="ekeFsnTop">
+	<?php if ($amountLeft < 0 ) {
+			echo $freeShipText; 
+		} else {
+			echo strtr($textContent, $vars); 
+	} ?>
+</div>

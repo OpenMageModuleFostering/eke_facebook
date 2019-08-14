@@ -6,38 +6,37 @@ if (!$helper->isTrackerPixelEnabled()) {
 $id = $helper->getTrackerPixelId();
 ?>
 
-<!-- Facebook Pixel Code--> 
-<script> 
-	!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod? 
-	n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n; 
-	n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0; 
-	t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, 
+<!-- Facebook Pixel Code-->
+<script>
+	!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+	n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+	n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+	t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 	document,'script','//connect.facebook.net/en_US/fbevents.js');
 	fbq('init', '<?php echo $id ?>');
     fbq('track', "PageView");
-	
-<?php 
+
+<?php
 	$request = $this->getRequest();
 	$module = $request->getModuleName();
 	$controller = $request->getControllerName();
 	$action = $request->getActionName();
-	
+
 	if(Mage::registry('current_product')) {echo "fbq('track', 'ViewContent');";	}
 	if($controller == 'result' || $controller =='advanced') { echo "fbq('track', 'Search');"; }
 	if($module == 'customer' && $controller == 'account' && $action == 'index'){echo "fbq('track', 'CompleteRegistration')";}
 	if($module == 'checkout' && $controller == 'cart' && $action == 'index') {echo "fbq('track', 'AddToCart');"; }
-	if($module == 'wishlist') {	echo "fbq('track', 'AddToWishlist');"; }	
+	if($module == 'wishlist') {	echo "fbq('track', 'AddToWishlist');"; }
 	if($module == 'checkout' && $action == 'index') { echo "fbq('track', 'InitiateCheckout');"; }
-	if($module == 'checkout' && $action == 'success') { 
+	if($module == 'checkout' && $action == 'success') {
 		$orderId = Mage::getSingleton('checkout/session')->getLastOrderId();
 		$order = Mage::getModel('sales/order')->load($orderId);
 		$total = round($order->getGrandTotal(), 2);
 		$currency = Mage::app()->getStore()->getCurrentCurrencyCode();
-		echo "fbq('track', 'Purchase', {value: '$total', currency: '$currency'});"; 
-	} 
-?>	
+		echo "fbq('track', 'Purchase', {value: '$total', currency: '$currency'});";
+	}
+?>
 
-</script> 
-<noscript><img height="1" width="1" style="display:none" src=" https://www.fbpixel.com/tr?id=<?php echo $id ?>&ev=PageView&noscript=1" /></noscript> 
-<!-- End Facebook Pixel Code --> 
-
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=<?php echo $id ?>&ev=PageView&noscript=1" /></noscript>
+<!-- End Facebook Pixel Code -->

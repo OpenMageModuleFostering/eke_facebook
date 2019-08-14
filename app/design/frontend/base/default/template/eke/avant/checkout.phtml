@@ -1,0 +1,21 @@
+<?php
+$helper = Mage::helper("eke_avant");
+if (!$helper->isAvantMetaEnabled()) {
+    return;
+}
+
+$siteid = $helper->getAvantSiteid();
+
+$order_id = Mage::getSingleton('checkout/session')->getLastRealOrderId(); 
+$_order = Mage::getModel('sales/order')->loadByIncrementId($order_id); 
+
+?>
+
+<!-- AvantLink Checkout Tracking -->
+<script type="text/javascript">
+var _AvantMetrics = _AvantMetrics || [];
+_AvantMetrics.push(['order',{ order_id:'<?php echo $_order->getIncrementId(); ?>', amount:'<?php echo round($_order->getGrandTotal(), 2); ?>', state:'<?php echo $_order->getShippingAddress()->getRegionCode(); ?>', country:'<?php echo $_order->getShippingAddress()->getCountry(); ?>' }]);
+<?php foreach($_order->getAllVisibleItems() as $item): ?>
+_AvantMetrics.push(['item',{ order_id:'<?php echo $_order->getIncrementId(); ?>', parent_sku:'<?php echo $item->getSku(); ?>', price:'<?php echo round($item->getPrice(), 2); ?>', qty:'<?php echo round($item->getQtyOrdered(), 0); ?>' }]);
+<?php endforeach ?> 
+</script>

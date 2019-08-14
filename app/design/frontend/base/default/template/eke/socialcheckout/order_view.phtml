@@ -1,0 +1,54 @@
+<?php
+$helper = Mage::helper("eke_socialcheckout");
+if (!$helper->isCheckoutSocialEnabled()) {
+    return;
+}
+$heading = $helper->getHeading();
+$subHeading = $helper->getSubHeading();
+$twitterUsername = $helper->getTwitterUsername();
+?>
+
+<div class="sc_container">
+<?php if(!empty($heading)) { echo "<h1>$heading</h1>"; } ?>
+<?php if(!empty($subHeading)) { echo "<h3>$subHeading</h3>"; } ?>
+
+<?php 
+
+$order = Mage::getSingleton('sales/order'); 
+$order->loadByIncrementId(Mage::getSingleton('checkout/session')->getLastRealOrderId());
+$_items = $order->getAllItems();
+
+foreach ($_items as $item){ ?>
+
+	<div class="sc_item">
+       
+        <img src="<?php echo $item->getProduct()->getImageUrl(); ?>" />
+        <p class="sc_item_name"><?php echo $item->getName(); ?></p>
+        
+        <div class="sc_icons">
+        <?php  $productUrl = Mage::getBaseUrl() . $item->getProduct()->getUrlPath(); ?>
+			<?php if ($helper->isFacebookEnabled()) { ?>
+            <a onClick="window.open('https://www.facebook.com/sharer.php?u=<?php echo $productUrl; ?>','sc_fbshare','toolbar=0,status=0,width=580,height=525');" href="javascript: void(0)" />
+            <i class="fa fa-facebook-official" aria-hidden="true"></i></a>
+            <?php } ?>
+            
+            <?php if ($helper->isTwitterEnabled()) { ?>
+            <a onClick="window.open('https://twitter.com/intent/tweet?url=<?php echo $productUrl; ?>&text=<?php echo $item->getProduct()->getName(); ?><?php if(!empty($twitterUsername)) {echo "&via=$twitterUsername";}?>','sc_twittershare','toolbar=0,status=0,width=580,height=525');" href="javascript: void(0)" />
+            <i class="fa fa-twitter-square" aria-hidden="true"></i></a>
+            <?php } ?>
+            
+            <?php if ($helper->isGoogleEnabled()) { ?>
+            <a onClick="window.open('https://plus.google.com/share?url=<?php echo $productUrl; ?>','sc_googleplusshare','toolbar=0,status=0,width=580,height=525');" href="javascript: void(0)" />
+            <i class="fa fa-google-plus-square" aria-hidden="true"></i></a>
+            <?php } ?>
+            
+            <?php if ($helper->isPinterestEnabled()) { ?>
+            <a onClick="window.open('https://pinterest.com/pin/create/bookmarklet/?media=<?php echo $item->getProduct()->getImageUrl(); ?>&url=<?php echo $productUrl; ?>&description=<?php echo $item->getProduct()->getName(); ?>','sc_pinterestshare','toolbar=0,status=0,width=800,height=700');" href="javascript: void(0)" />
+            <i class="fa fa-pinterest-square" aria-hidden="true"></i></a>
+			<?php } ?>
+            
+        </div>
+        
+	</div>
+<?php } ?>
+</div>

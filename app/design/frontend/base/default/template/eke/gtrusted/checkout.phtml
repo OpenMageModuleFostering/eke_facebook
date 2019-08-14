@@ -1,0 +1,54 @@
+<?php
+$helper = Mage::helper("eke_gtrusted");
+if (!$helper->isGtrustedMetaEnabled()) {
+    return;
+}
+
+$order_id = Mage::getSingleton('checkout/session')->getLastRealOrderId(); 
+$_order = Mage::getModel('sales/order')->loadByIncrementId($order_id); 
+
+$estimatedDelivery = $helper->getEstimatedDelivery();
+$estimatedShip = $helper->getEstimatedShip();
+
+if(!empty($estimatedShip)){$estShipTime = $estimatedShip; } else { $estShipTime = 3; }
+if(!empty($estimatedDelivery)){$estDelTime = $estimatedDelivery; } else { $estDelTime = 7; }
+
+
+$est_ship = date('Y-m-d', strtotime("+$estShipTime days"));
+
+$est_delivery = date('Y-m-d', strtotime("+$estDelTime days"));
+
+?>
+
+
+
+<div id="gts-order" style="display:none;" translate="no">
+
+<!-- start order and merchant information -->
+<span id="gts-o-id"><?php echo $_order->getIncrementId(); ?></span>
+<span id="gts-o-email"><?php echo $_order->getCustomerEmail(); ?></span>
+<span id="gts-o-country"><?php echo $_order->getShippingAddress()->getCountry(); ?></span>
+<span id="gts-o-currency"><?php echo Mage::app()->getStore()->getCurrentCurrency()->getCode(); ?></span>
+<span id="gts-o-total"><?php echo round($_order->getGrandTotal(), 2); ?></span>
+<span id="gts-o-discounts"><?php echo round($_order->getDiscountAmount(), 2); ?></span>
+<span id="gts-o-shipping-total"><?php echo round($_order->getShippingAmount(), 2); ?></span>
+<span id="gts-o-tax-total"><?php echo round($_order->getTaxAmount(), 2); ?></span>
+<span id="gts-o-est-ship-date"><?php echo $est_ship; ?></span>
+<span id="gts-o-est-delivery-date"><?php echo $est_delivery; ?></span>
+<span id="gts-o-has-preorder">N</span>
+<span id="gts-o-has-digital">N</span>
+<!-- end order and merchant information -->
+
+
+<?php foreach($_order->getAllVisibleItems() as $item): ?>
+<!-- start repeated item specific information -->
+  <span class="gts-item">
+    <span class="gts-i-name"><?php echo $item->getName(); ?></span>
+    <span class="gts-i-price"><?php echo round($item->getPrice(), 2); ?></span>
+    <span class="gts-i-quantity"><?php echo round($item->getQtyOrdered(), 0); ?></span>
+    <span class="gts-i-prodsearch-id"><?php echo $item->getSku(); ?></span>
+  </span>
+  <!-- end repeated item specific information -->
+<?php endforeach ?> 
+</div>
+<!-- END Google Trusted Stores Order -->
