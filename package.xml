@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+    <name>Eke_Facebook</name>
+    <version>0.1.0</version>
+    <stability>stable</stability>
+    <license uri="http://opensource.org/licenses/osl-3.0.php">OSL v3.0</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>Facebook tracking pixel integration extension for Magento.</summary>
+    <description>This extension integrations the Facebook tracking pixel and tracks events.</description>
+    <notes>Initial release Facebook tracking pixel integration.</notes>
+    <authors><author><name>Eke Digital</name><user>ekedigital</user><email>dane@ekedigital.com</email></author></authors>
+    <date>2016-09-11</date>
+    <time>01:46:22</time>
+    <contents><target name="magecommunity"><dir name="Eke"><dir name="Facebook"><dir name="Helper"><file name="Data.php" hash="fafa66007e137e4ca8bcf75033f14627"/></dir><dir name="etc"><file name="adminhtml.xml" hash="70388eac316c72e69c41d267180b200b"/><file name="config.xml" hash="12c1dfde8fe42b2eca87049d8ceaae3c"/><file name="system.xml" hash="b416e03fdf2f18f1111a8cb6184df22d"/></dir></dir></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="template"><dir name="eke"><dir name="facebook"><file name="tracker.phtml" hash="6e843cf236e8553ae5186fa66f43e673"/></dir></dir></dir><dir name="layout"><file name="eke_facebook.xml" hash="b4f8c22bfb782fdf80b196e4d3f12205"/></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Eke_Facebook.xml" hash="d0d055838e8b56b18c889fa4ed68a3b1"/></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.1.0</min><max>6.0.0</max></php><package><name>Mage_Core_Helper_Abstract</name><channel>community</channel><min>1.6</min><max>1.9</max></package></required></dependencies>
+</package>

@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/Eke_Facebook",
+    "type": "magento-module",
+    "license": "OSL-v3.0",
+    "homepage": "",
+    "description": "Facebook tracking pixel integration extension for Magento.",
+    "authors": [
+    {
+        "name": "Eke Digital",
+        "email": "dane@ekedigital.com"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
